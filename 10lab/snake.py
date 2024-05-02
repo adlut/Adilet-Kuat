@@ -18,9 +18,9 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Змейка")
 
 conn = psycopg2.connect(
-    dbname='suppliers',
+    dbname='ddr',
     user='postgres',
-    password='dimash',
+    password='adlut',
     host='localhost'
 )
 cursor = conn.cursor()
@@ -216,4 +216,4 @@ def insert_user(user_name, score):
 
 user_id = insert_user(snake.player_name, score)
 if user_id:
-    print("Успешно записан")
+    print("Успешно запсиан")

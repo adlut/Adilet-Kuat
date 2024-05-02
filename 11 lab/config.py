@@ -1,4 +1,4 @@
-def load_config():
+def load_conf():
     return {
         'host': "localhost",
         'user': "postgres",
