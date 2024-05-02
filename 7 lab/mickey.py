@@ -13,7 +13,7 @@ r_list={
 pygame.init()
 screen = pygame.display.set_mode((497, 502))
 pygame.display.set_caption("clock")
-bg = pygame.image.load('images/az.png').convert_alpha()
+bg = pygame.image.load('images/zzzz.png').convert_alpha()
 music_playing=False
 bg_m = 0
 font = pygame.font.SysFont('big', 40)

@@ -125,7 +125,7 @@ while not done:
 
     # Handle key presses for changing color and tool
     pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_RIGHT]:
+    if pressed[pygame.K_a]:
         fps = 7
         index_color += 1
         if index_color == len(colors):
@@ -133,7 +133,7 @@ while not done:
         text_color = str("Color: " + str(colors[index_color]))
         text_color_surface = font.render(text_color, True, (255, 255, 255))
 
-    if pressed[pygame.K_LEFT]:
+    if pressed[pygame.K_d]:
         fps = 7
         index_color -= 1
         if index_color == -1:
@@ -141,7 +141,7 @@ while not done:
         text_color = str("Color: " + str(colors[index_color]))
         text_color_surface = font.render(text_color, True, (255, 255, 255))
 
-    if pressed[pygame.K_UP]:
+    if pressed[pygame.K_w]:
         fps = 7
         index_tool += 1
         if index_tool == len(tools):
@@ -149,7 +149,7 @@ while not done:
         text_tool = str("Function: " + str(tools[index_tool]))
         text_tool_surface = font.render(text_tool, True, (255, 255, 255))
 
-    if pressed[pygame.K_DOWN]:
+    if pressed[pygame.K_s]:
         fps = 7
         index_tool -= 1
         if index_tool == -1:
@@ -165,7 +165,6 @@ while not done:
 
     # Draw menu on top of the screen
     screen.blit(menu_surface, (0, 0))
-
     # Update display and control FPS
     pygame.display.flip()
     clock.tick(fps)
