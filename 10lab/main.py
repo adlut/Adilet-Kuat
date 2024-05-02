@@ -1,7 +1,3 @@
-
-
-import psycopg2
-from config import load_config
 import psycopg2
 from config import load_config
 
@@ -13,7 +9,7 @@ def connect():
     host = config['host']
     user = config['user']
     password = config['password']
-    dbname = config['dbname']
+    dbname = config['database']  # Adjusted key name
 
     # Connect to the database using the extracted details
     return psycopg2.connect(
@@ -23,8 +19,11 @@ def connect():
         password=password
     )
 
+# The rest of your code remains the same...
+
 
 def create_table():
+    connection = None
     try:
         connection = connect()
         with connection.cursor() as cursor:
@@ -45,10 +44,11 @@ def create_table():
             print("[INFO] Successfully closed connection")
 
 def add_user():
-    name = input("Enter user name: ")
-    phone = input("Enter user phone: ")
+    connection = None
     try:
         connection = connect()
+        name = input("Enter user name: ")
+        phone = input("Enter user phone: ")
         with connection.cursor() as cursor:
             insert_query = "INSERT INTO users (name, phone) VALUES (%s, %s)"
             cursor.execute(insert_query, (name, phone))
@@ -62,17 +62,24 @@ def add_user():
             print("[INFO] Successfully closed connection")
 
 def query_users():
-    name = input("Enter user name to query (leave blank to query all users): ")
-    phone = input("Enter user phone to query (leave blank to query all users): ")
+    connection = None
     try:
         connection = connect()
+        name = input("Enter user name to query (leave blank to query all users): ")
+        phone = input("Enter user phone to query (leave blank to query all users): ")
         with connection.cursor() as cursor:
             select_query = "SELECT * FROM users WHERE TRUE"
+            conditions = []
+            params = []
             if name:
-                select_query += f" AND name = '{name}'"
+                conditions.append("name = %s")
+                params.append(name)
             if phone:
-                select_query += f" AND phone = '{phone}'"
-            cursor.execute(select_query)
+                conditions.append("phone = %s")
+                params.append(phone)
+            if conditions:
+                select_query += " AND " + " AND ".join(conditions)
+            cursor.execute(select_query, params)
             users = cursor.fetchall()
             print("Users:")
             for user in users:
@@ -84,13 +91,47 @@ def query_users():
             connection.close()
             print("[INFO] Successfully closed connection")
 
-def delete_user():
-    name = input("Enter user NAME to delete: ")
+def update_user():
+    connection = None
     try:
         connection = connect()
+        user_id = input("Enter user ID to update: ")
+        name = input("Enter new name (leave blank to keep unchanged): ")
+        phone = input("Enter new phone (leave blank to keep unchanged): ")
         with connection.cursor() as cursor:
-            delete_query = f"DELETE FROM users WHERE name = '{name}'"
-            cursor.execute(delete_query)
+            update_query = "UPDATE users SET"
+            updates = []
+            params = []
+            if name:
+                updates.append("name = %s")
+                params.append(name)
+            if phone:
+                updates.append("phone = %s")
+                params.append(phone)
+            if updates:
+                update_query += " " + ", ".join(updates)
+                update_query += " WHERE id = %s"
+                params.append(user_id)
+                cursor.execute(update_query, params)
+                print("User updated successfully.")
+            else:
+                print("No changes specified.")
+    except Exception as ex:
+        print("[INFO] Error:", ex)
+    finally:
+        if connection:
+            connection.commit()
+            connection.close()
+            print("[INFO] Successfully closed connection")
+
+def delete_user():
+    connection = None
+    try:
+        connection = connect()
+        name = input("Enter user NAME to delete: ")
+        with connection.cursor() as cursor:
+            delete_query = "DELETE FROM users WHERE name = %s"
+            cursor.execute(delete_query, (name,))
             print("User deleted successfully.")
     except Exception as ex:
         print("[INFO] Error:", ex)
@@ -106,8 +147,9 @@ def main():
         print("\nChoose an option:")
         print("1. Add user")
         print("2. Query users")
-        print("3. Delete user")
-        print("4. Exit")
+        print("3. Update user")
+        print("4. Delete user")
+        print("5. Exit")
         choice = input("Enter your choice: ")
 
         if choice == "1":
@@ -115,8 +157,10 @@ def main():
         elif choice == "2":
             query_users()
         elif choice == "3":
-            delete_user()
+            update_user()
         elif choice == "4":
+            delete_user()
+        elif choice == "5":
             break
         else:
             print("Invalid choice. Please choose a valid option.")

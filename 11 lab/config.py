@@ -1,7 +1,7 @@
-def load_conf():
+def load_config():
     return {
         'host': "localhost",
         'user': "postgres",
         'password': "adlut",
-        'dbname': "ddr"
+        'database': "ddr"
     }
